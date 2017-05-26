@@ -13,6 +13,9 @@ import resetter
 resetter.GUI()
 ```
 
+## Version 2.3.0 (2017-05-26)
+- Created standalone project for resetter
+
 ## Version 2.2.0 (2012-04-01)
 - Much improved api
 - General organization and simplification
