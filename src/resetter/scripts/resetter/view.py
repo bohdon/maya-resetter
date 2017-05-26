@@ -2,15 +2,41 @@
 import pymel.core as pm
 import logging
 
-from core import *
+import core
 
 __all__ = [
-	"GUI",
+    "GUI",
+    "printDefaults",
+    "printObjectsWithDefaults",
 ]
 
 LOG = logging.getLogger('resetter')
 LOG.setLevel(logging.INFO)
 
+
+# Utils
+# -----
+
+def printObjectsWithDefaults():
+    nodes = core.getObjectsWithDefaults()
+    LOG.info('Objects with defaults ({0})'.format(len(nodes)))
+    for n in nodes:
+        LOG.info('   {0}'.format(n))
+
+def printDefaults():
+    nodes = core.getObjectsWithDefaults()
+    LOG.info('Object defaults ({0})'.format(len(nodes)))
+    for n in nodes:
+        defaults = core.getDefaults(n)
+        LOG.info('   {0}: {1}'.format(n, defaults))
+
+def selectObjectsWithDefaults():
+    pm.select(core.getObjectsWithDefaults())
+
+
+
+# View
+# ----
 
 class GUI(object):
     def __init__(self):
@@ -34,26 +60,26 @@ class GUI(object):
         with pm.window(self.winName, rtf=1, mb=1, tlb=True, t='Resetter') as self.win:
             imenu = pm.menu(l='Info')
             pm.setParent(imenu, m=True)
-            pm.menuItem(l='List Objects with Defaults', c=pm.Callback(listObjectsWithDefaults))
             pm.menuItem(l='Select Objects with Defaults', c=pm.Callback(selectObjectsWithDefaults))
-            pm.menuItem(l='List Defaults', c=pm.Callback(listDefaults))
+            pm.menuItem(l='Print Objects with Defaults', c=pm.Callback(printObjectsWithDefaults))
+            pm.menuItem(l='Print Default Values', c=pm.Callback(printDefaults))
             
             with pm.formLayout(nd=100) as form:
                 
                 with pm.frameLayout(l='Set/Remove Defaults', bs='out', mw=2, mh=2, cll=True, cl=True) as setFrame:
                     with pm.columnLayout(rs=2, adj=True):
-                        pm.button(l='Set Defaults', c=pm.Callback(setDefaults), bgc=self.colSet, ann='Set defaults on the selected objects using all keyable attributes')
-                        pm.button(l='Set Defaults Include Non-Keyable', c=pm.Callback(setDefaultsNonkeyable), bgc=self.colSet, ann='Set defaults on the selected objects using keyable and non-keyable attributes in the channel box')
-                        pm.button(l='Set Defaults with CB Selection', c=pm.Callback(setDefaultsCBSelection), bgc=self.colSet, ann='Set defaults on the selected objects using the selected channel box attributes')
-                        pm.button(l='Remove Defaults', c=pm.Callback(removeDefaults), bgc=self.colRemove, ann='Remove all defaults from the selected objects')
-                        pm.button(l='Remove from All Objects', c=pm.Callback(removeAllDefaults), bgc=self.colRemove, ann='Remove defaults from all objects in the scene')
+                        pm.button(l='Set Defaults', c=pm.Callback(core.setDefaults), bgc=self.colSet, ann='Set defaults on the selected objects using all keyable attributes')
+                        pm.button(l='Set Defaults Include Non-Keyable', c=pm.Callback(core.setDefaultsNonkeyable), bgc=self.colSet, ann='Set defaults on the selected objects using keyable and non-keyable attributes in the channel box')
+                        pm.button(l='Set Defaults with CB Selection', c=pm.Callback(core.setDefaultsCBSelection), bgc=self.colSet, ann='Set defaults on the selected objects using the selected channel box attributes')
+                        pm.button(l='Remove Defaults', c=pm.Callback(core.removeDefaults), bgc=self.colRemove, ann='Remove all defaults from the selected objects')
+                        pm.button(l='Remove from All Objects', c=pm.Callback(core.removeAllDefaults), bgc=self.colRemove, ann='Remove defaults from all objects in the scene')
                 
                 with pm.frameLayout(l='Reset', bs='out', mw=2, mh=2) as resetFrame:
                     with pm.formLayout(nd=100) as resetForm:
-                        b6 = pm.button(l='Smart', c=pm.Callback(resetSmart), bgc=self.colReset, ann='Reset the selected objects. Uses transform standards if no defaults are defined for translate, rotate, and scale')
-                        b7 = pm.button(l='Default', c=pm.Callback(reset), bgc=self.colReset, ann='Reset the selected objects using only stored defaults, if any')
-                        b8 = pm.button(l='Transform', c=pm.Callback(resetTransform), bgc=self.colReset, ann='Reset the selected objects using only transform standards for translate, rotate, scale (eg. 0, 0, 1)')
-                        b9 = pm.button(l='All', c=pm.Callback(resetAll), bgc=self.colReset2, ann='Reset all objects in the scene with defaults')
+                        b6 = pm.button(l='Smart', c=pm.Callback(core.resetSmart), bgc=self.colReset, ann='Reset the selected objects. Uses transform standards if no defaults are defined for translate, rotate, and scale')
+                        b7 = pm.button(l='Default', c=pm.Callback(core.reset), bgc=self.colReset, ann='Reset the selected objects using only stored defaults, if any')
+                        b8 = pm.button(l='Transform', c=pm.Callback(core.resetTransform), bgc=self.colReset, ann='Reset the selected objects using only transform standards for translate, rotate, scale (eg. 0, 0, 1)')
+                        b9 = pm.button(l='All', c=pm.Callback(core.resetAll), bgc=self.colReset2, ann='Reset all objects in the scene with defaults')
                         pm.formLayout(resetForm, e=True,
                             ap=[(b6, 'left', 0, 0), (b6, 'right', 2, 25),
                                 (b7, 'left', 2, 25), (b7, 'right', 2, 50),

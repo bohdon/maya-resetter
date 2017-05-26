@@ -7,15 +7,12 @@ __all__ = [
     "getDefaults",
     "getDefaultsAttr",
     "getObjectsWithDefaults",
-    "listDefaults",
-    "listObjectsWithDefaults",
     "removeAllDefaults",
     "removeDefaults",
     "reset",
     "resetAll",
     "resetSmart",
     "resetTransform",
-    "selectObjectsWithDefaults",
     "setDefaults",
     "setDefaultsCBSelection",
     "setDefaultsForAttrs",
@@ -271,28 +268,6 @@ def reset(nodes=None, useDefaults=True, useStandards=False, useCBSelection=True)
 
 # Utils
 # -----
-
-def listObjectsWithDefaults():
-    nodes = getObjectsWithDefaults()
-    LOG.info('Objects with defaults ({0})'.format(len(nodes)))
-    for n in nodes:
-        LOG.info('   {0}'.format(n))
-
-def listDefaults(nodes=None):
-    if nodes is None:
-        sel = pm.selected()
-        if len(sel) > 0:
-            nodes = sel
-        else:
-            nodes = getObjectsWithDefaults()
-    nodesWithDefaults = [n for n in nodes if n.hasAttr(DEFAULTS_ATTR)]
-    LOG.info('Object defaults ({0})'.format(len(nodesWithDefaults)))
-    for n in nodesWithDefaults:
-        defaults = getDefaults(n)
-        LOG.info('   {0}: {1}'.format(n, defaults))
-
-def selectObjectsWithDefaults():
-    pm.select(getObjectsWithDefaults())
 
 
 def getChannelBoxSelection(main=True, shape=True, out=True, hist=True):
