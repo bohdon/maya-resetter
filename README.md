@@ -16,6 +16,23 @@ import resetter
 resetter.GUI()
 ```
 
+## Main Commands
+
+Here are some of the main commands that make useful shelf buttons or hotkeys.
+
+```python
+import resetter
+
+# store the selected nodes current keyable values as their defaults
+resetter.setDefaults()
+
+# reset selected nodes using defined defaults or basic transform defaults
+resetter.reset()
+
+# reset selected nodes using only defined defaults
+resetter.reset(useBasicDefaults=False)
+```
+
 
 ## Version 2.3.0 (2017-05-26)
 - Created standalone project for resetter
