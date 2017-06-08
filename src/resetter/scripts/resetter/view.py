@@ -76,19 +76,23 @@ class GUI(object):
                 
                 with pm.frameLayout(l='Reset', bs='out', mw=2, mh=2) as resetFrame:
                     with pm.formLayout(nd=100) as resetForm:
-                        b6 = pm.button(l='Smart', c=pm.Callback(core.resetSmart), bgc=self.colReset, ann='Reset the selected objects. Uses transform standards if no defaults are defined for translate, rotate, and scale')
-                        b7 = pm.button(l='Default', c=pm.Callback(core.reset), bgc=self.colReset, ann='Reset the selected objects using only stored defaults, if any')
-                        b8 = pm.button(l='Transform', c=pm.Callback(core.resetTransform), bgc=self.colReset, ann='Reset the selected objects using only transform standards for translate, rotate, scale (eg. 0, 0, 1)')
-                        b9 = pm.button(l='All', c=pm.Callback(core.resetAll), bgc=self.colReset2, ann='Reset all objects in the scene with defaults')
+                        b6 = pm.button(l='Reset', c=pm.Callback(core.reset), bgc=self.colReset, ann='Reset the selected objects. Uses basic transform defaults if no defaults are defined for translate, rotate, and scale')
+                        b7 = pm.button(l='Defined Only', c=pm.Callback(self.resetDefinedOnly), bgc=self.colReset, ann='Reset the selected objects using only defined defaults')
+                        b9 = pm.button(l='All Defined', c=pm.Callback(core.resetAll), bgc=self.colReset2, ann='Reset all objects in the scene with defaults')
                         pm.formLayout(resetForm, e=True,
-                            ap=[(b6, 'left', 0, 0), (b6, 'right', 2, 25),
-                                (b7, 'left', 2, 25), (b7, 'right', 2, 50),
-                                 (b8, 'left', 2, 50), (b8, 'right', 2, 75),
-                                  (b9, 'left', 2, 75), (b9, 'right', 2, 100), ])
+                            ap=[(b6, 'left', 0, 0), (b6, 'right', 2, 33),
+                                (b7, 'left', 2, 33), (b7, 'right', 2, 66),
+                                  (b9, 'left', 2, 66), (b9, 'right', 2, 100), ])
                 
                 mw = 4
                 pm.formLayout(form, e=True,
                     af=[(setFrame, 'left', mw), (setFrame, 'right', mw),
                         (resetFrame, 'left', mw), (resetFrame, 'right', mw)],
                     ac=[(resetFrame, 'top', 2, setFrame)],  )
+
+    def resetDefinedOnly(self):
+        core.reset(useBasicDefaults=False)
+
+    def resetBasicTransformsOnly(self):
+        core.resetBasicTransforms()
 

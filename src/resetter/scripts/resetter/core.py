@@ -11,8 +11,6 @@ __all__ = [
     "removeDefaults",
     "reset",
     "resetAll",
-    "resetSmart",
-    "resetTransform",
     "setDefaults",
     "setDefaultsCBSelection",
     "setDefaultsForAttrs",
@@ -138,9 +136,6 @@ def getDefaultsAttr(node, create=False):
 
 def getDefaults(node):
     """ Returns the defaults of a node, if they exist, as a dictionary. """
-    from pymel.core import dt
-    from pymel.core.datatypes import Matrix
-    
     dattr = getDefaultsAttr(node)
     if dattr is not None:
         defaultsRaw = None
@@ -206,25 +201,24 @@ def removeAllDefaults():
 # Resetting
 # ---------
 
-def resetSmart(nodes=None):
-    reset(nodes, useDefaults=True, useStandards=True)
-
-def resetTransform(nodes=None):
-    reset(nodes, useDefaults=False, useStandards=True)
-
 def resetAll():
-    reset(getObjectsWithDefaults())
-
-def reset(nodes=None, useDefaults=True, useStandards=False, useCBSelection=True):
     """
-    Reset the given node's attributes to their default values.
+    Find and reset all nodes in the scene that have
+    defaults defined.
+    """
+    reset(getObjectsWithDefaults(), useBasicDefaults=False)
+
+
+def reset(nodes=None, useBasicDefaults=True, useCBSelection=True):
+    """
+    Reset the given nodes' attributes to their default values.
     Uses the selection if no nodes are given.
-    
-    `useDefaults` -- use the defaults to reset attributes
-    `useStandards` -- reset transform, rotate, scale to 0, 0, and 1
-        if no defaults are found for those attributes.
-    `useCBSelection` -- if there is a channel box selection, use it
-        to limit which attributes will be reset
+
+    Args:
+        useBasicDefaults: When True, if no defaults have been defined for a node, and the
+            node is a transform, reset its translate, rotate, scale to 0, 0, and 1
+        useCBSelection: When True, if there is a channel box selection, use it
+            to limit which attributes will be reset
     """
     if nodes is None:
         nodes = pm.selected()
@@ -237,25 +231,24 @@ def reset(nodes=None, useDefaults=True, useStandards=False, useCBSelection=True)
     
     selAttrs = getChannelBoxSelection()
     for n in nodes:
-        settings = {}
-        # add stored defaults
-        if useDefaults:
-            defaults = getDefaults(n)
-            settings.update(defaults)
-        # add standard transform reset values
-        if useStandards and len(settings) == 0:
+        newAttrVals = {}
+        # add pre-defined defaults
+        defaults = getDefaults(n)
+        newAttrVals.update(defaults)
+        # add basic transform reset values
+        if useBasicDefaults and len(newAttrVals) == 0:
             for a in [i+j for i in 'trs' for j in 'xyz']:
-                # standards are only added if they are settable
+                # only add if they are settable
                 if n.hasAttr(a) and n.attr(a).isSettable():
-                    settings[n.attr(a)] = 1 if 's' in a else 0
+                    newAttrVals[n.attr(a)] = 1 if 's' in a else 0
         # trim using cb selection
         if useCBSelection and len(selAttrs) > 0:
             nodeSelAttrs = {} if not selAttrs.has_key(n) else selAttrs[n]
-            delAttrs = [a for a in settings.keys() if a not in nodeSelAttrs]
+            delAttrs = [a for a in newAttrVals.keys() if a not in nodeSelAttrs]
             for a in delAttrs:
-                del settings[a]
+                del newAttrVals[a]
                 
-        for attr, value in settings.items():
+        for attr, value in newAttrVals.items():
             if attr.isSettable():
                 try:
                     attr.set(value)
@@ -264,6 +257,7 @@ def reset(nodes=None, useDefaults=True, useStandards=False, useCBSelection=True)
                     LOG.info (e)
             else:
                 LOG.info ('skipping {0}. attribute not settable'.format(attr))
+
 
 
 # Utils
