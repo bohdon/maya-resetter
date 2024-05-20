@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This project was moved into [maya-workflowtools](https://github.com/bohdon/maya-workflowtools)
+
 # Maya Attribute Resetter
 
 A simple util for quickly resetting transform or other node attributes to their defaults in Maya.
